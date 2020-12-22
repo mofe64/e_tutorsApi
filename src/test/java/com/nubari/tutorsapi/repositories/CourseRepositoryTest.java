@@ -16,7 +16,7 @@ class CourseRepositoryTest {
     void setUp() {
     }
 
-    @AfterEachgi
+    @AfterEach
     void tearDown() {
     }
     @Test
