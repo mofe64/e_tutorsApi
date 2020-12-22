@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -24,13 +25,14 @@ public class User {
     private String username;
 
     @DBRef
-    private List<Class> classesAttending;
+    private List<Class> classesAttending = new ArrayList<>();
     @DBRef
-    private List<Class> ClassesTaught;
+    private List<Class> ClassesTaught = new ArrayList<>();
     @DBRef
-    private List<Course> coursesRegisteredFor;
+    private List<Course> coursesRegisteredFor = new ArrayList<>();
     @DBRef
-    private List<Course> coursesTeaching;
+    private List<Course> coursesTeaching = new ArrayList<>();
     @DBRef
     private Set<Role> roles;
+
 }
