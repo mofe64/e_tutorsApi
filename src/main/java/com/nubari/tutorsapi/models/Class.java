@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,8 +23,8 @@ public class Class {
     @DBRef
     private Course courseTaught;
     @DBRef
-    private User tutor;
+    private List<User> tutors = new ArrayList<>();
     @DBRef
-    private List<User> students;
+    private List<User> students = new ArrayList<>();
 
 }
