@@ -21,6 +21,7 @@ public class User {
     private String lastname;
     private String email;
     private String password;
+    private String username;
 
     @DBRef
     private List<Class> classesAttending;
