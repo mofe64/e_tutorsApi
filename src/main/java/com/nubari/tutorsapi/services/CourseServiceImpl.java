@@ -12,7 +12,6 @@ import com.nubari.tutorsapi.models.Course;
 import com.nubari.tutorsapi.models.User;
 import com.nubari.tutorsapi.repositories.ClassRepository;
 import com.nubari.tutorsapi.repositories.CourseRepository;
-import com.nubari.tutorsapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +23,6 @@ import java.util.Optional;
 public class CourseServiceImpl implements CourseService {
     @Autowired
     CourseRepository courseRepository;
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     UserService userService;
     @Autowired
