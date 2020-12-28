@@ -23,4 +23,7 @@ public class Course {
     private List<User> registeredStudents = new ArrayList<>();
     @DBRef
     private List<User> tutors = new ArrayList<>();
+    private int numberOfStudentsEnrolled;
+    @DBRef
+    private List<Class> classes = new ArrayList<>();
 }
