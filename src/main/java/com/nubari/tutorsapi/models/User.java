@@ -23,7 +23,7 @@ public class User {
     private String email;
     private String password;
     private String username;
-
+    private String userType;
     @DBRef
     private List<Class> classesAttending = new ArrayList<>();
     @DBRef
