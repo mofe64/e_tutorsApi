@@ -1,12 +1,10 @@
 package com.nubari.tutorsapi.services;
 
-import com.nubari.tutorsapi.dtos.StudentDto;
-import com.nubari.tutorsapi.dtos.TutorDto;
-import com.nubari.tutorsapi.exceptions.CourseLimitReachedException;
-import com.nubari.tutorsapi.exceptions.CourseNotFoundException;
-import com.nubari.tutorsapi.exceptions.StudentNotFoundException;
-import com.nubari.tutorsapi.exceptions.TutorNotFoundException;
+
+import com.nubari.tutorsapi.dtos.UserDto;
+import com.nubari.tutorsapi.exceptions.*;
 import com.nubari.tutorsapi.models.Course;
+import com.nubari.tutorsapi.models.Role;
 import com.nubari.tutorsapi.models.User;
 import com.nubari.tutorsapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,7 +26,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 //    ClassService classService;
 
     @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
     CourseService courseService;
+
+    @Autowired
+    RoleService roleService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -54,21 +59,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<StudentDto> getAllStudents() {
-        List<StudentDto> studentDtos = new ArrayList<>();
+    public List<UserDto> getAllStudents() throws UserRoleNotFoundException {
+        List<UserDto> userDtos = new ArrayList<>();
         List<User> students = getAllExistingStudents();
         for (User student : students) {
-            StudentDto studentDto = new StudentDto();
-            studentDtos.add(studentDto.packDto(student));
+            UserDto userDto = new UserDto();
+            userDtos.add(userDto.packDto(student));
         }
-        return studentDtos;
+        return userDtos;
     }
 
-    private List<User> getAllExistingStudents() {
+    private List<User> getAllExistingStudents() throws UserRoleNotFoundException {
         List<User> users = userRepository.findAll();
         List<User> students = new ArrayList<>();
+        Role studentRole = roleService.findByName("Student");
         for (User user : users) {
-            if (user.getUserType().equals("student")) {
+            if (user.getRoles().contains(studentRole)) {
                 students.add(user);
             }
         }
@@ -76,21 +82,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<TutorDto> getAllTutors() {
-        List<TutorDto> tutorDtos = new ArrayList<>();
+    public List<UserDto> getAllTutors() throws UserRoleNotFoundException {
+        List<UserDto> tutorDtos = new ArrayList<>();
         List<User> tutors = getAllExistingTutors();
         for (User tutor : tutors) {
-            TutorDto tutorDto = new TutorDto();
+            UserDto tutorDto = new UserDto();
             tutorDtos.add(tutorDto.packDto(tutor));
         }
         return tutorDtos;
     }
 
-    private List<User> getAllExistingTutors() {
+    private List<User> getAllExistingTutors() throws UserRoleNotFoundException {
         List<User> users = userRepository.findAll();
         List<User> tutors = new ArrayList<>();
+        Role tutorRole = roleService.findByName("Tutor");
         for (User user : users) {
-            if (user.getUserType().equals("tutor")) {
+            if (user.getRoles().contains(tutorRole)) {
                 tutors.add(user);
             }
         }
@@ -98,35 +105,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public StudentDto getStudentDetails(String studentId) throws StudentNotFoundException {
-        StudentDto studentDto = new StudentDto();
-        return studentDto.packDto(findStudentById(studentId));
+    public UserDto getStudentDetails(String studentId) throws StudentNotFoundException {
+        UserDto userDto = new UserDto();
+        return userDto.packDto(findStudentById(studentId));
     }
 
     @Override
-    public TutorDto getTutorDetails(String tutorId) throws TutorNotFoundException {
-        TutorDto tutorDto = new TutorDto();
-        return tutorDto.packDto(findATutorById(tutorId));
+    public UserDto getTutorDetails(String tutorId) throws TutorNotFoundException {
+        UserDto userDto = new UserDto();
+        return userDto.packDto(findATutorById(tutorId));
     }
 
     @Override
-    public StudentDto updateStudentDetails(String studentId, StudentDto studentDto) throws StudentNotFoundException {
+    public UserDto updateStudentDetails(String studentId, UserDto userDto) throws StudentNotFoundException {
         User studentToUpdate = findStudentById(studentId);
-        if (!studentDto.getUsername().equals("")) {
-            studentToUpdate.setUsername(studentDto.getUsername());
+        if (!userDto.getUsername().equals("")) {
+            studentToUpdate.setUsername(userDto.getUsername());
         }
-        if (!studentDto.getFirstname().equals("")) {
-            studentToUpdate.setFirstname(studentDto.getFirstname());
+        if (!userDto.getFirstname().equals("")) {
+            studentToUpdate.setFirstname(userDto.getFirstname());
         }
-        if (!studentDto.getLastname().equals("")) {
-            studentToUpdate.setLastname(studentDto.getLastname());
+        if (!userDto.getLastname().equals("")) {
+            studentToUpdate.setLastname(userDto.getLastname());
         }
-        if (!studentDto.getEmail().equals("")) {
-            studentToUpdate.setEmail(studentDto.getEmail());
+        if (!userDto.getEmail().equals("")) {
+            studentToUpdate.setEmail(userDto.getEmail());
         }
         User updatedStudent = updateStudent(studentToUpdate);
-        StudentDto returnValue = new StudentDto();
-        return returnValue.packDto(updatedStudent);
+        return userDto.packDto(updatedStudent);
     }
 
     private User updateStudent(User updatedStudent) {
@@ -134,23 +140,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public TutorDto updateTutorDetails(String tutorId, TutorDto tutorDto) throws TutorNotFoundException {
+    public UserDto updateTutorDetails(String tutorId, UserDto userDto) throws TutorNotFoundException {
         User tutorToUpdate = findATutorById(tutorId);
-        if (!tutorDto.getUsername().equals("")) {
-            tutorToUpdate.setUsername(tutorDto.getUsername());
+        if (!userDto.getUsername().equals("")) {
+            tutorToUpdate.setUsername(userDto.getUsername());
         }
-        if (!tutorDto.getFirstname().equals("")) {
-            tutorToUpdate.setFirstname(tutorDto.getFirstname());
+        if (!userDto.getFirstname().equals("")) {
+            tutorToUpdate.setFirstname(userDto.getFirstname());
         }
-        if (!tutorDto.getLastname().equals("")) {
-            tutorToUpdate.setLastname(tutorDto.getLastname());
+        if (!userDto.getLastname().equals("")) {
+            tutorToUpdate.setLastname(userDto.getLastname());
         }
-        if (!tutorDto.getEmail().equals("")) {
-            tutorToUpdate.setEmail(tutorDto.getEmail());
+        if (!userDto.getEmail().equals("")) {
+            tutorToUpdate.setEmail(userDto.getEmail());
         }
         User updatedTutor = updateTutor(tutorToUpdate);
-        TutorDto returnValue = new TutorDto();
-        return returnValue.packDto(updatedTutor);
+        return userDto.packDto(updatedTutor);
     }
 
     private User updateTutor(User updatedTutor) {
@@ -179,8 +184,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private void deleteATutor(String tutorId) throws CourseNotFoundException, TutorNotFoundException {
         User tutor = findATutorById(tutorId);
         List<Course> coursesTutorIsTaking = tutor.getCoursesRegisteredFor();
-        for (Course course: coursesTutorIsTaking){
-            courseService.removeTutorFromCourse(tutor.getId(),course.getId());
+        for (Course course : coursesTutorIsTaking) {
+            courseService.removeTutorFromCourse(tutor.getId(), course.getId());
         }
     }
 
@@ -275,4 +280,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private void saveAUser(User user) {
         userRepository.save(user);
     }
+
+    @Override
+    public UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException {
+        User student = userDto.unpackDto();
+        student.setPassword(bCryptPasswordEncoder.encode(student.getPassword()));
+        Role role = roleService.findByName("Student");
+        student.getRoles().add(role);
+        User savedStudent = registerStudent(student);
+        return userDto.packDto(savedStudent);
+    }
+
+    private User registerStudent(User student) {
+        return userRepository.save(student);
+    }
+
+    @Override
+    public UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException {
+        User tutor = userDto.unpackDto();
+        tutor.setPassword(bCryptPasswordEncoder.encode(tutor.getPassword()));
+        Role role = roleService.findByName("Tutor");
+        tutor.getRoles().add(role);
+        User savedTutor = registerTutor(tutor);
+        return userDto.packDto(savedTutor);
+    }
+
+    private User registerTutor(User tutor) {
+        return userRepository.save(tutor);
+    }
+
+
 }

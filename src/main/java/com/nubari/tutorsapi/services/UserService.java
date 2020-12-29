@@ -1,16 +1,14 @@
 package com.nubari.tutorsapi.services;
 
-import com.nubari.tutorsapi.dtos.StudentDto;
-import com.nubari.tutorsapi.dtos.TutorDto;
-import com.nubari.tutorsapi.exceptions.CourseLimitReachedException;
-import com.nubari.tutorsapi.exceptions.CourseNotFoundException;
-import com.nubari.tutorsapi.exceptions.StudentNotFoundException;
-import com.nubari.tutorsapi.exceptions.TutorNotFoundException;
+
+import com.nubari.tutorsapi.dtos.UserDto;
+import com.nubari.tutorsapi.exceptions.*;
 import com.nubari.tutorsapi.models.User;
 
 import java.util.List;
 
 public interface UserService {
+
 
     void registerStudentForCourse(String studentId, String courseId) throws CourseNotFoundException, CourseLimitReachedException, StudentNotFoundException;
 
@@ -28,19 +26,22 @@ public interface UserService {
 
     User findTutorById(String tutorId) throws TutorNotFoundException;
 
+    UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException;
+    UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException;
+
     void saveUser(User user);
 
-    List<StudentDto> getAllStudents();
+    List<UserDto> getAllStudents() throws UserRoleNotFoundException;
 
-    List<TutorDto> getAllTutors();
+    List<UserDto> getAllTutors() throws UserRoleNotFoundException;
 
-    StudentDto getStudentDetails(String studentId) throws StudentNotFoundException;
+    UserDto getStudentDetails(String studentId) throws StudentNotFoundException;
 
-    TutorDto getTutorDetails(String tutorId) throws TutorNotFoundException;
+    UserDto getTutorDetails(String tutorId) throws TutorNotFoundException;
 
-    StudentDto updateStudentDetails(String studentId, StudentDto studentDto) throws StudentNotFoundException;
+    UserDto updateStudentDetails(String studentId, UserDto userDto) throws StudentNotFoundException;
 
-    TutorDto updateTutorDetails(String tutorId, TutorDto tutorDto) throws TutorNotFoundException;
+    UserDto updateTutorDetails(String tutorId, UserDto userDto) throws TutorNotFoundException;
 
     void deleteStudent(String studentId) throws CourseNotFoundException, StudentNotFoundException;
 
