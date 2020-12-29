@@ -36,7 +36,6 @@ class ClassRepositoryTest {
         student.setFirstname("Tayo");
         student.setId("002");
         Class newClass = new Class();
-        newClass.setClassDate(LocalDate.now());
         newClass.getTutors().add(tutor);
         newClass.getStudents().add(student);
         Class savedClass = classRepository.save(newClass);

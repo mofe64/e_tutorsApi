@@ -10,7 +10,6 @@ import com.nubari.tutorsapi.exceptions.TutorNotFoundException;
 import com.nubari.tutorsapi.models.Class;
 import com.nubari.tutorsapi.models.Course;
 import com.nubari.tutorsapi.models.User;
-import com.nubari.tutorsapi.repositories.ClassRepository;
 import com.nubari.tutorsapi.repositories.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     UserService userService;
     @Autowired
-    ClassRepository classRepository;
+    ClassService classService;
 
     @Override
     public CourseDto createCourse(CourseDto courseDto) {
@@ -107,7 +106,7 @@ public class CourseServiceImpl implements CourseService {
                 newClass.getTutors().add(tutor);
             }
             courseRepository.save(course);
-            classRepository.save(newClass);
+            classService.saveClass(newClass);
             return newClass;
         } else {
             throw new CourseNotFoundException();
@@ -120,20 +119,15 @@ public class CourseServiceImpl implements CourseService {
     }
 
     private void cancelAClassForACourse(String classId) throws ClassCouldNotBeFoundException {
-        Optional<Class> classToDelete = classRepository.findById(classId);
-        if (classToDelete.isPresent()) {
-            classRepository.delete(classToDelete.get());
-        } else {
-            throw new ClassCouldNotBeFoundException();
-        }
+        classService.cancelClass(classId);
     }
 
     @Override
-    public void deleteCourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException {
+    public void deleteCourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException, ClassCouldNotBeFoundException {
         deleteACourse(courseId);
     }
 
-    private void deleteACourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException {
+    private void deleteACourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException, ClassCouldNotBeFoundException {
         Optional<Course> courseOptional = courseRepository.findById(courseId);
         if (courseOptional.isPresent()) {
             Course courseToDelete = courseOptional.get();
@@ -142,7 +136,7 @@ public class CourseServiceImpl implements CourseService {
             List<User> tutorsTakingCourseToDelete = courseToDelete.getTutors();
             if (existingClassesForCourseToDelete.size() > 0) {
                 for (Class existingClass : existingClassesForCourseToDelete) {
-                    classRepository.delete(existingClass);
+                    classService.cancelClass(existingClass.getId());
                 }
             }
             if (studentsAttendingCourseToDelete.size() > 0) {

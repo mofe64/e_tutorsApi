@@ -6,10 +6,8 @@ import com.nubari.tutorsapi.models.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ClassDto {
     private String id;
-    @NonNull
     private Course courseTaught;
     private List<User> tutors = new ArrayList<>();
     private List<User> students = new ArrayList<>();

@@ -18,7 +18,7 @@ public interface CourseService {
 
     void cancelClassForCourse(String classId) throws ClassCouldNotBeFoundException;
 
-    void deleteCourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException;
+    void deleteCourse(String courseId) throws StudentNotFoundException, TutorNotFoundException, CourseNotFoundException, ClassCouldNotBeFoundException;
 
     List<CourseDto> getAllCourses();
 
