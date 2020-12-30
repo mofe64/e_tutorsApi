@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Value("${jwt.header.string}")
-    public String HEADER_STRING;
+//    @Value("${jwt.header.string}")
+//    public String HEADER_STRING;
 
     @Value("${jwt.token.prefix}")
     public String TOKEN_PREFIX;
