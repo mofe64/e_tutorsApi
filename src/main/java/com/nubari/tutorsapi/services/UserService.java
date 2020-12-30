@@ -18,16 +18,13 @@ public interface UserService {
 
     void removeTutorFromCourse(String tutorId, String courseId) throws CourseNotFoundException, TutorNotFoundException;
 
-    void scheduleAClassForACourse(String tutorId, String courseId);
-
-    void cancelAClass(String tutorId, String courseId);
-
     User findStudentById(String studentId) throws StudentNotFoundException;
 
     User findTutorById(String tutorId) throws TutorNotFoundException;
 
-    UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException;
-    UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException;
+    UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException;
+
+    UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException;
 
     void saveUser(User user);
 
@@ -46,5 +43,9 @@ public interface UserService {
     void deleteStudent(String studentId) throws CourseNotFoundException, StudentNotFoundException;
 
     void deleteTutor(String tutorId) throws CourseNotFoundException, TutorNotFoundException;
+
+    boolean checkIfUserWithThisUsernameExists(String username);
+
+    boolean checkIfUserWithThisEmailExists(String email);
 
 }

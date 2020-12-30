@@ -1,7 +1,9 @@
 package com.nubari.tutorsapi.controllers;
 
 import com.nubari.tutorsapi.dtos.*;
+import com.nubari.tutorsapi.exceptions.EmailAlreadyExistsException;
 import com.nubari.tutorsapi.exceptions.UserRoleNotFoundException;
+import com.nubari.tutorsapi.exceptions.UsernameAlreadyExistsException;
 import com.nubari.tutorsapi.models.Role;
 import com.nubari.tutorsapi.models.User;
 import com.nubari.tutorsapi.security.jwt.TokenProvider;
@@ -50,6 +52,12 @@ public class AuthController {
             return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
         } catch (UserRoleNotFoundException e) {
             return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (UsernameAlreadyExistsException usernameAlreadyExistsException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "Username already exists"),
+                    HttpStatus.BAD_REQUEST);
+        } catch (EmailAlreadyExistsException emailAlreadyExistsException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "Email already exists"),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -60,6 +68,12 @@ public class AuthController {
             return new ResponseEntity<>(newTutor, HttpStatus.CREATED);
         } catch (UserRoleNotFoundException e) {
             return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+        } catch (UsernameAlreadyExistsException usernameAlreadyExistsException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "Username already exists"),
+                    HttpStatus.BAD_REQUEST);
+        } catch (EmailAlreadyExistsException emailAlreadyExistsException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "Email already exists"),
+                    HttpStatus.BAD_REQUEST);
         }
     }
 

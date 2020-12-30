@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
-//    @Autowired
-//    ClassService classService;
+    @Autowired
+    ClassService classService;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -235,16 +235,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void scheduleAClassForACourse(String tutorId, String courseId) {
-
-    }
-
-    @Override
-    public void cancelAClass(String tutorId, String courseId) {
-
-    }
-
-    @Override
     public User findStudentById(String studentId) throws StudentNotFoundException {
         return findAStudentById(studentId);
     }
@@ -282,8 +272,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException {
+    public UserDto registerStudent(UserDto userDto) throws UserRoleNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException {
         User student = userDto.unpackDto();
+        boolean usernameExists = checkIfUserWithThisUsernameExists(student.getUsername());
+        boolean emailExists = checkIfUserWithThisEmailExists(student.getEmail());
+        if (usernameExists) {
+            throw new UsernameAlreadyExistsException();
+        }
+        if (emailExists) {
+            throw new EmailAlreadyExistsException();
+        }
         student.setPassword(bCryptPasswordEncoder.encode(student.getPassword()));
         Role role = roleService.findByName("Student");
         student.getRoles().add(role);
@@ -296,8 +294,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException {
+    public UserDto registerTutor(UserDto userDto) throws UserRoleNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException {
         User tutor = userDto.unpackDto();
+        boolean usernameExists = checkIfUserWithThisUsernameExists(tutor.getUsername());
+        boolean emailExists = checkIfUserWithThisEmailExists(tutor.getEmail());
+        if (usernameExists) {
+            throw new UsernameAlreadyExistsException();
+        }
+        if (emailExists) {
+            throw new EmailAlreadyExistsException();
+        }
         tutor.setPassword(bCryptPasswordEncoder.encode(tutor.getPassword()));
         Role role = roleService.findByName("Tutor");
         tutor.getRoles().add(role);
@@ -309,5 +315,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(tutor);
     }
 
+    @Override
+    public boolean checkIfUserWithThisUsernameExists(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        return userOptional.isPresent();
+    }
+
+    @Override
+    public boolean checkIfUserWithThisEmailExists(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        return userOptional.isPresent();
+    }
 
 }
