@@ -327,4 +327,36 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userOptional.isPresent();
     }
 
+    @Override
+    public List<UserDto> findAllStudentsTakingACourse(String courseId) throws CourseNotFoundException {
+        Course course = courseService.findCourseById(courseId);
+        List<User> students = findAllStudentsTakingACourse(course);
+        List<UserDto> studentsTakingCourse = new ArrayList<>();
+        UserDto studentDto = new UserDto();
+        for (User student : students) {
+            studentsTakingCourse.add(studentDto.packDto(student));
+        }
+        return studentsTakingCourse;
+    }
+
+    private List<User> findAllStudentsTakingACourse(Course course) {
+        return userRepository.findUsersByCoursesRegisteredFor(course);
+    }
+
+    @Override
+    public List<UserDto> findAllTutorsTeachingACourse(String courseId) throws CourseNotFoundException {
+        Course course = courseService.findCourseById(courseId);
+        List<User> tutors = findAllTutorsTeachingACourse(course);
+        List<UserDto> tutorsTeachingCourse = new ArrayList<>();
+        UserDto tutorDto = new UserDto();
+        for (User tutor : tutors) {
+            tutorsTeachingCourse.add(tutorDto.packDto(tutor));
+        }
+        return tutorsTeachingCourse;
+    }
+
+    private List<User> findAllTutorsTeachingACourse(Course course) {
+        return userRepository.findUsersByCoursesTeaching(course);
+    }
+
 }

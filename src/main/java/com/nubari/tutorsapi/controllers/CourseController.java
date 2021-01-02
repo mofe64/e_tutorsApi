@@ -3,6 +3,7 @@ package com.nubari.tutorsapi.controllers;
 import com.nubari.tutorsapi.dtos.APIResponseModel;
 import com.nubari.tutorsapi.dtos.ClassDto;
 import com.nubari.tutorsapi.dtos.CourseDto;
+import com.nubari.tutorsapi.dtos.UserDto;
 import com.nubari.tutorsapi.exceptions.ClassCouldNotBeFoundException;
 import com.nubari.tutorsapi.exceptions.CourseNotFoundException;
 import com.nubari.tutorsapi.exceptions.StudentNotFoundException;
@@ -29,20 +30,21 @@ public class CourseController {
     @Autowired
     ClassService classService;
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasRole('Admin')")
     @PostMapping("new")
     public ResponseEntity<?> createCourse(@RequestBody CourseDto courseDto) {
         CourseDto response = courseService.createCourse(courseDto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-    @PreAuthorize("hasRole('Student')")
+
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("all")
     public ResponseEntity<?> getAllCourses() {
         List<CourseDto> courseList = courseService.getAllCourses();
         return new ResponseEntity<>(courseList, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("{courseId}")
     public ResponseEntity<?> getCourse(@PathVariable String courseId) {
         try {
@@ -54,6 +56,7 @@ public class CourseController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @PatchMapping("{courseId}")
     public ResponseEntity<?> updateCourseDetails(@RequestBody CourseDto courseDto, @PathVariable String courseId) {
         try {
@@ -65,6 +68,7 @@ public class CourseController {
         }
     }
 
+    @PreAuthorize("hasRole('Admin' )")
     @DeleteMapping("{courseId}")
     public ResponseEntity<?> deleteCourse(@PathVariable String courseId) {
         try {
@@ -86,7 +90,7 @@ public class CourseController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @PostMapping("{courseId}/class/create")
     public ResponseEntity<?> createNewClass(@RequestBody ClassDto classDto, @PathVariable String courseId) {
         try {
@@ -99,7 +103,7 @@ public class CourseController {
 
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @PostMapping("{classId}/class/cancel")
     public ResponseEntity<?> cancelClass(@PathVariable String classId) {
         try {
@@ -110,5 +114,29 @@ public class CourseController {
                     HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
+    @GetMapping("{courseId}/students/all")
+    public ResponseEntity<?> getAllStudentsTeachingACourse(@PathVariable String courseId) {
+        try {
+            List<UserDto> studentsTakingCourse = userService.findAllStudentsTakingACourse(courseId);
+            return new ResponseEntity<>(studentsTakingCourse, HttpStatus.OK);
+        } catch (CourseNotFoundException courseNotFoundException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "No Course found with that Id"),
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
+    @GetMapping("{courseId}/tutors/all")
+    public ResponseEntity<?> getAllTutorsTeachingACourse(@PathVariable String courseId) {
+        try {
+            List<UserDto> tutorsTakingCourse = userService.findAllStudentsTakingACourse(courseId);
+            return new ResponseEntity<>(tutorsTakingCourse, HttpStatus.OK);
+        } catch (CourseNotFoundException courseNotFoundException) {
+            return new ResponseEntity<>(new APIResponseModel(false, "No Course found with that Id"),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 }

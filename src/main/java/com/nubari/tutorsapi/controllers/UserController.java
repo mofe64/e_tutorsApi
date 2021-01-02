@@ -27,7 +27,7 @@ public class UserController {
     ClassService classService;
 
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin' )")
     @GetMapping("students/all")
     public ResponseEntity<?> getStudents() {
         try {
@@ -39,7 +39,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("students/{studentId}")
     public ResponseEntity<?> getAStudent(@PathVariable String studentId) {
         try {
@@ -51,7 +51,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("tutors/all")
     public ResponseEntity<?> getTutors() {
         try {
@@ -63,7 +63,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("tutors/{tutorId}")
     public ResponseEntity<?> getATutor(@PathVariable String tutorId) {
         try {
@@ -75,7 +75,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Admin', 'Student')")
     @PatchMapping("student/{studentId}")
     public ResponseEntity<?> updateStudentDetails(@RequestBody UserDto updatedStudent, @PathVariable String studentId) {
         try {
@@ -87,7 +87,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @PatchMapping("tutor/{tutorId}")
     public ResponseEntity<?> updateTutorDetails(@RequestBody UserDto updatedTutor, @PathVariable String tutorId) {
         try {
@@ -99,7 +99,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("student/{studentId}/course/{courseId}/enroll")
     public ResponseEntity<?> registerStudentForCourse(@PathVariable String courseId, @PathVariable String studentId) {
         try {
@@ -118,7 +118,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin', 'Student')")
     @GetMapping("studnet/{studentId}/course/{courseId}/unenroll")
     public ResponseEntity<?> removeStudentFromCourse(@PathVariable String courseId, @PathVariable String studentId) {
         try {
@@ -135,7 +135,7 @@ public class UserController {
 
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @GetMapping("tutor/{tutorId}/course/{courseId}/enroll")
     public ResponseEntity<?> registerTutorForCourse(@PathVariable String courseId, @PathVariable String tutorId) {
         try {
@@ -151,7 +151,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasRole('Student')")
+    @PreAuthorize("hasAnyRole('Tutor', 'Admin')")
     @GetMapping("tutor/{tutorId}/course/{courseId}/unenroll")
     public ResponseEntity<?> removeTutorFromCourse(@PathVariable String courseId, @PathVariable String tutorId) {
         try {
@@ -166,8 +166,5 @@ public class UserController {
                     HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
 
 }

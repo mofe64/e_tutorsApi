@@ -3,6 +3,7 @@ package com.nubari.tutorsapi.services;
 
 import com.nubari.tutorsapi.dtos.UserDto;
 import com.nubari.tutorsapi.exceptions.*;
+import com.nubari.tutorsapi.models.Course;
 import com.nubari.tutorsapi.models.User;
 
 import java.util.List;
@@ -47,5 +48,9 @@ public interface UserService {
     boolean checkIfUserWithThisUsernameExists(String username);
 
     boolean checkIfUserWithThisEmailExists(String email);
+
+    List<UserDto> findAllStudentsTakingACourse(String courseId) throws CourseNotFoundException;
+
+    List<UserDto> findAllTutorsTeachingACourse(String courseId) throws CourseNotFoundException;
 
 }
